@@ -48,7 +48,7 @@ namespace spring_petclinic_visits_unit_test.Repository.Pets
       var visits = await _visitsRepo.FindByPetId(petId, default);
 
       Assert.NotNull(visits);
-      Assert.Equal(Fill.Visits.Count(), visits.Count());
+      Assert.Equal(Fill.Visits.Where(q => q.PetId == petId).Count(), visits.Count());
     }
   }
 }

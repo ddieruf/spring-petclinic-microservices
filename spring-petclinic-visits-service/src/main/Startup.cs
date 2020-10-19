@@ -26,12 +26,16 @@ namespace spring_petclinic_visits_api
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services)
     {
-      //DATA CONTEXTS
-			if (Environment.IsDevelopment()) {
-				services.AddDbContext<VisitsContext>(options => options.UseInMemoryDatabase("PetClinic_Visits"));
-			}else{
-				services.AddDbContext<VisitsContext>(options => options.UseSqlServer(Configuration));
-			}
+      //DATA CONTEXT
+      switch (Environment.EnvironmentName) {
+        case ("Development"):
+        case ("Docker"):
+          services.AddDbContext<VisitsContext>(options => options.UseInMemoryDatabase("PetClinic_Customers"));
+          break;
+        default:
+          services.AddDbContext<VisitsContext>(options => options.UseSqlServer(Configuration));
+          break;
+      };
 
       //REPOSITORIES
       services.AddScoped<Repository.IVisits, Repository.Visits>();
@@ -48,13 +52,17 @@ namespace spring_petclinic_visits_api
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger, VisitsContext dbContext)
     {
-      if (env.IsDevelopment())
-      {
-        logger.LogInformation("Running as development environment");
-        app.UseDeveloperExceptionPage();
+      switch (Environment.EnvironmentName) {
+        case ("Development"):
+        case ("Docker"):
+          logger.LogInformation("Running as development environment");
+          app.UseDeveloperExceptionPage();
 
-        dbContext.SeedAll();
-      }
+          dbContext.SeedAll();
+          break;
+        default:
+          break;
+      };
 
       app.UseHttpsRedirection();
 

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Steeltoe.Management.Tracing;
 using spring_petclinic_customers_api.Data;
+using System;
 
 namespace spring_petclinic_customers_api
 {
@@ -26,12 +27,16 @@ namespace spring_petclinic_customers_api
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services)
     {
-      //DATA CONTEXTS
-			if (Environment.IsDevelopment()) {
-				services.AddDbContext<CustomersContext>(options => options.UseInMemoryDatabase("PetClinic_Customers"));
-			}else{
-				services.AddDbContext<CustomersContext>(options => options.UseSqlServer(Configuration));
-			}
+      //DATA CONTEXT
+      switch(Environment.EnvironmentName) {
+        case ("Development"):
+        case ("Docker"):
+          services.AddDbContext<CustomersContext>(options => options.UseInMemoryDatabase("PetClinic_Customers"));
+          break;
+        default:
+          services.AddDbContext<CustomersContext>(options => options.UseSqlServer(Configuration));
+          break;
+      };
 
       //REPOSITORIES
       services.AddScoped<Repository.IPets, Repository.Pets>();
@@ -42,20 +47,24 @@ namespace spring_petclinic_customers_api
       services.AddDistributedTracing(Configuration, builder => builder.UseZipkinWithTraceOptions(services));
 
       services.AddSwaggerGen();
-
+      
       services.AddAuthorization();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger, CustomersContext dbContext)
     {
-      if (env.IsDevelopment())
-      {
-        logger.LogInformation("Running as development environment");
-        app.UseDeveloperExceptionPage();
+      switch (Environment.EnvironmentName) {
+        case ("Development"):
+        case ("Docker"):
+          logger.LogInformation("Running as development environment");
+          app.UseDeveloperExceptionPage();
 
-        dbContext.SeedAll();
-      }
+          dbContext.SeedAll();
+          break;
+        default:
+          break;
+      };
 
       app.UseHttpsRedirection();
 

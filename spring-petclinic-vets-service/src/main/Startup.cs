@@ -24,14 +24,17 @@ namespace spring_petclinic_vets_api
 
     // This method gets called by the runtime. Use this method to add services to the container.
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-    public void ConfigureServices(IServiceCollection services)
-    {
-      //DATA CONTEXTS
-			if (Environment.IsDevelopment()) {
-				services.AddDbContext<VetsContext>(options => options.UseInMemoryDatabase("PetClinic_Vets"));
-			}else{
-				services.AddDbContext<VetsContext>(options => options.UseSqlServer(Configuration));
-			}
+    public void ConfigureServices(IServiceCollection services) {
+      //DATA CONTEXT
+      switch (Environment.EnvironmentName) {
+        case ("Development"):
+        case ("Docker"):
+          services.AddDbContext<VetsContext>(options => options.UseInMemoryDatabase("PetClinic_Vets"));
+          break;
+        default:
+          services.AddDbContext<VetsContext>(options => options.UseSqlServer(Configuration));
+          break;
+      };
 
       //REPOSITORIES
       services.AddScoped<Repository.IVets, Repository.Vets>();
@@ -48,14 +51,17 @@ namespace spring_petclinic_vets_api
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger, VetsContext dbContext)
     {
-      if (env.IsDevelopment())
-      {
-        logger.LogInformation("Running as development environment");
-        app.UseDeveloperExceptionPage();
+      switch (Environment.EnvironmentName) {
+        case ("Development"):
+        case ("Docker"):
+          logger.LogInformation("Running as development environment");
+          app.UseDeveloperExceptionPage();
 
-        dbContext.SeedAll();
-      }
-
+          dbContext.SeedAll();
+          break;
+        default:
+          break;
+      };
       app.UseHttpsRedirection();
 
       app.UseRouting();

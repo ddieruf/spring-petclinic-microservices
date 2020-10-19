@@ -19,37 +19,73 @@ services:
      - 8761:8761
 
   customers-service:
-    image: springcommunity/spring-petclinic-customers-service
+    build:
+      context: ./spring-petclinic-customers-service/src/main
     container_name: customers-service
     mem_limit: 512M
     depends_on:
-     - config-server
-     - discovery-server
-    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+      - config-server
+      - discovery-server
+    entrypoint: ["dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","dotnet", "customers-service.dll"]
     ports:
-    - 8081:8081
+    - 8081:5000
 
   visits-service:
-    image: springcommunity/spring-petclinic-visits-service
+    build:
+      context: ./spring-petclinic-visits-service/src/main
     container_name: visits-service
     mem_limit: 512M
     depends_on:
-     - config-server
-     - discovery-server
-    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+      - config-server
+      - discovery-server
+    entrypoint: ["dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","dotnet", "visits-service.dll"]
     ports:
-     - 8082:8082
+    - 8082:5000
 
   vets-service:
-    image: springcommunity/spring-petclinic-vets-service
+    build:
+      context: ./spring-petclinic-vets-service/src/main
     container_name: vets-service
     mem_limit: 512M
     depends_on:
-     - config-server
-     - discovery-server
-    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+      - config-server
+      - discovery-server
+    entrypoint: ["dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","dotnet", "vets-service.dll"]
     ports:
-     - 8083:8083
+    - 8083:5000
+
+  # customers-service:
+  #   image: springcommunity/spring-petclinic-customers-service
+  #   container_name: customers-service
+  #   mem_limit: 512M
+  #   depends_on:
+  #    - config-server
+  #    - discovery-server
+  #   entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+  #   ports:
+  #   - 8081:8081
+
+  # visits-service:
+  #   image: springcommunity/spring-petclinic-visits-service
+  #   container_name: visits-service
+  #   mem_limit: 512M
+  #   depends_on:
+  #    - config-server
+  #    - discovery-server
+  #   entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+  #   ports:
+  #    - 8082:8082
+
+  # vets-service:
+  #   image: springcommunity/spring-petclinic-vets-service
+  #   container_name: vets-service
+  #   mem_limit: 512M
+  #   depends_on:
+  #    - config-server
+  #    - discovery-server
+  #   entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+  #   ports:
+  #    - 8083:8083
 
   api-gateway:
     image: springcommunity/spring-petclinic-api-gateway

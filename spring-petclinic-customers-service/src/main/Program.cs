@@ -1,15 +1,17 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Steeltoe.Common.Hosting;
 using Steeltoe.Discovery.Client;
 using Steeltoe.Extensions.Configuration.ConfigServer;
 using Steeltoe.Extensions.Logging;
 using Steeltoe.Management.Endpoint;
 
+
 namespace spring_petclinic_customers_api
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static void Main(string[] args) 
         {
             CreateHostBuilder(args).Build().Run();
         }
@@ -20,6 +22,7 @@ namespace spring_petclinic_customers_api
                 {
                     webBuilder.UseStartup<Startup>();
                 })
+                .UseCloudHosting(5000)
                 .AddAllActuators()
                 .AddDynamicLogging()
                 .AddConfigServer()
