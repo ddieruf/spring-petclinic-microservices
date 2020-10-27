@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster as builder
 WORKDIR application
 COPY ["spring-petclinic-customers-api.csproj", ""]
-RUN dotnet restore -s "https://api.nuget.org/v3/index.json" -s "https://www.myget.org/F/steeltoedev/api/v3/index.json"
+RUN dotnet restore
 COPY . .
 RUN dotnet publish -c Release -o publish
 
