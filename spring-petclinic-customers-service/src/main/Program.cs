@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Steeltoe.Common.Hosting;
 using Steeltoe.Discovery.Client;
 using Steeltoe.Extensions.Configuration.ConfigServer;
@@ -25,8 +27,20 @@ namespace spring_petclinic_customers_api
                 .UseCloudHosting(5000)
                 .AddAllActuators()
                 .AddDynamicLogging()
-                .AddConfigServer()
+                .AddConfigServer(GetLoggerFactory())
                 .AddDiscoveryClient()
                 ;
+
+        public static ILoggerFactory GetLoggerFactory()
+        {
+            IServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Trace));
+            serviceCollection.AddLogging(builder => builder.AddConsole((opts) =>
+            {
+                opts.DisableColors = true;
+            }));
+            serviceCollection.AddLogging(builder => builder.AddDebug());
+            return serviceCollection.BuildServiceProvider().GetService<ILoggerFactory>();
+        }
     }
 }

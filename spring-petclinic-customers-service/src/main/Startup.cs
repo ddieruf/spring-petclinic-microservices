@@ -57,7 +57,7 @@ namespace spring_petclinic_customers_api
       switch (Environment.EnvironmentName) {
         case ("Development"):
         case ("Docker"):
-          logger.LogInformation("Running as development environment");
+          logger.LogInformation($"Running as {Environment.EnvironmentName} environment");
           app.UseDeveloperExceptionPage();
 
           dbContext.SeedAll();
@@ -66,7 +66,7 @@ namespace spring_petclinic_customers_api
           break;
       };
 
-      app.UseHttpsRedirection();
+      //app.UseHttpsRedirection();
 
       app.UseRouting();
 

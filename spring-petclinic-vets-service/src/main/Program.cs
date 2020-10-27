@@ -24,8 +24,19 @@ namespace spring_petclinic_vets_api
                 .UseCloudHosting(5000)
                 .AddAllActuators()
                 .AddDynamicLogging()
-                .AddConfigServer()
+                .AddConfigServer(GetLoggerFactory())
                 .AddDiscoveryClient()
                 ;
+        public static ILoggerFactory GetLoggerFactory()
+        {
+            IServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Trace));
+            serviceCollection.AddLogging(builder => builder.AddConsole((opts) =>
+            {
+                opts.DisableColors = true;
+            }));
+            serviceCollection.AddLogging(builder => builder.AddDebug());
+            return serviceCollection.BuildServiceProvider().GetService<ILoggerFactory>();
+        }
     }
 }
