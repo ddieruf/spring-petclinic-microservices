@@ -3,12 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Steeltoe.Connector.SqlServer.EFCore;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Steeltoe.Management.Tracing;
-using spring_petclinic_customers_api.Data;
-using System;
+using spring_petclinic_customers_api.Infrastructure;
 
 namespace spring_petclinic_customers_api
 {
@@ -28,15 +25,7 @@ namespace spring_petclinic_customers_api
     public void ConfigureServices(IServiceCollection services)
     {
       //DATA CONTEXT
-      switch(Environment.EnvironmentName) {
-        case ("Development"):
-        case ("Docker"):
-          services.AddDbContext<CustomersContext>(options => options.UseInMemoryDatabase("PetClinic_Customers"));
-          break;
-        default:
-          services.AddDbContext<CustomersContext>(options => options.UseSqlServer(Configuration));
-          break;
-      };
+      services.AddDbContext<CustomersContext>(options => options.UseInMemoryDatabase("PetClinic_Customers"));
 
       //REPOSITORIES
       services.AddScoped<Repository.IPets, Repository.Pets>();
@@ -59,12 +48,12 @@ namespace spring_petclinic_customers_api
         case ("Docker"):
           logger.LogInformation($"Running as {Environment.EnvironmentName} environment");
           app.UseDeveloperExceptionPage();
-
-          dbContext.SeedAll();
           break;
         default:
           break;
       };
+
+      dbContext.SeedAll();
 
       //app.UseHttpsRedirection();
 

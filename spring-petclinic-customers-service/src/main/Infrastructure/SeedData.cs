@@ -1,7 +1,6 @@
 using System.Threading;
 
-namespace spring_petclinic_customers_api.Data
-{
+namespace spring_petclinic_customers_api.Infrastructure {
   internal static class SeedData
   {
   public static async void SeedAll(this CustomersContext dbContext,

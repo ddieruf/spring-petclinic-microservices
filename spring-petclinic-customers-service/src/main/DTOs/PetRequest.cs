@@ -1,8 +1,8 @@
+using spring_petclinic_customers_api.Domain;
 using System;
 using System.Text.Json.Serialization;
 
-namespace spring_petclinic_customers_api.Views
-{
+namespace spring_petclinic_customers_api.DTOs {
   public class PetRequest
   {
     public PetRequest() { }
@@ -20,5 +20,9 @@ namespace spring_petclinic_customers_api.Views
     public string Name { get; set; }
 
     public int PetTypeId { get; set; }
+
+    public Pet ToPet(int ownerId) {
+      return new Pet(Name, BirthDate, PetTypeId, ownerId, Id);
+    }
   }
 }

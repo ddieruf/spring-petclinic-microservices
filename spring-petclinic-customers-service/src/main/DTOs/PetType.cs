@@ -3,16 +3,18 @@ using System.Collections.Generic;
 
 namespace spring_petclinic_customers_api.DTOs
 {
-    public partial class PetType
-    {
-        public PetType()
-        {
-            //Pets = new HashSet<Pet>();
-        }
+  public class PetType {
 
-        public int Id { get; set; }
-        public string Name { get; set; }
+    public PetType(){}
 
-       // public virtual ICollection<Pet> Pets { get; set; }
+    public int Id { get; set; }
+    public string Name { get; set; }
+
+    public static DTOs.PetType ToDTO(Domain.PetType petType) {
+      return new PetType() {
+        Id = petType.Id,
+        Name = petType.Name
+      };
     }
+  }
 }

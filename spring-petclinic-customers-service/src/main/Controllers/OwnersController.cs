@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -23,33 +25,38 @@ namespace spring_petclinic_customers_api.Controllers
     }
 
     [HttpPost]
-    [ProducesResponseType(201)]
-    public async Task<ActionResult> CreateOwner([FromBody] Owner ownerRequest, CancellationToken cancellationToken)
+    [ProducesResponseType((int)HttpStatusCode.Created)]
+    public async Task<ActionResult> CreateOwner([FromBody] OwnerRequest ownerRequest, CancellationToken cancellationToken)
     {
       _logger.LogInformation($"Saving owner {ownerRequest}");
-      var owner = await _ownersRepo.Save(ownerRequest, cancellationToken);
-      return Created($"owners/{owner.Id}", owner);
+      var owner = await _ownersRepo.Save(ownerRequest.ToOwner(), cancellationToken);
+      return Created($"owners/{owner.Id}", OwnerDetails.FromOwner(owner));
     }
 
     [HttpGet("{ownerId}")]
-    [ProducesResponseType(typeof(Owner), 200)]
-    public async Task<ActionResult<Owner>> FindOwner(int ownerId, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(DTOs.OwnerDetails), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<DTOs.OwnerDetails>> FindOwner(int ownerId, CancellationToken cancellationToken)
     {
       var owner = await _ownersRepo.FindById(ownerId, cancellationToken);
-      return Ok(owner);
+      return Ok(OwnerDetails.FromOwner(owner));
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(List<Owner>), 200)]
-    public async Task<ActionResult<List<Owner>>> FindAll(CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(List<DTOs.OwnerDetails>), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<List<DTOs.OwnerDetails>>> FindAll(CancellationToken cancellationToken)
     {
-      var owner = await _ownersRepo.FindAll(cancellationToken);
-      return Ok(owner);
+      var owners = await _ownersRepo.FindAll(cancellationToken);
+
+      var ret = new List<DTOs.OwnerDetails>();
+      foreach (var owner in owners)
+        ret.Add(OwnerDetails.FromOwner(owner));
+
+      return Ok(ret);
     }
 
     [HttpPut("{ownerId}")]
-    [ProducesResponseType(204)]
-    public async Task<ActionResult> ProcessUpdateForm(int ownerId, [FromBody] Owner ownerRequest, CancellationToken cancellationToken)
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    public async Task<ActionResult> ProcessUpdateForm(int ownerId, [FromBody] OwnerRequest ownerRequest, CancellationToken cancellationToken)
     {
       var owner = await _ownersRepo.FindById(ownerId, cancellationToken);
 
@@ -57,7 +64,7 @@ namespace spring_petclinic_customers_api.Controllers
         throw new ResourceNotFoundException("Owner " + ownerId + " not found");
 
       _logger.LogInformation($"Updating owner {ownerRequest}");
-      await _ownersRepo.Update(owner, ownerRequest, cancellationToken);
+      await _ownersRepo.Update(owner, ownerRequest.ToOwner(), cancellationToken);
 
       return NoContent();
     }

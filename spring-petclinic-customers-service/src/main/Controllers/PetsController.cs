@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using spring_petclinic_customers_api.DTOs;
 using spring_petclinic_customers_api.Repository;
-using spring_petclinic_customers_api.Views;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,15 +26,20 @@ namespace spring_petclinic_customers_api.Controllers
     }
 
     [HttpGet("petTypes")]
-    [ProducesResponseType(typeof(List<PetType>), 200)]
-    public async Task<ActionResult<List<PetType>>> GetPetTypes(CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(List<DTOs.PetType>), 200)]
+    public async Task<ActionResult<List<DTOs.PetType>>> GetPetTypes(CancellationToken cancellationToken)
     {
-      var ret = await _petsRepo.FindPetTypes(cancellationToken);
+      var petTypes = await _petsRepo.FindPetTypes(cancellationToken);
+
+      var ret = new List<DTOs.PetType>();
+      foreach (var petType in petTypes)
+        ret.Add(PetType.ToDTO(petType));
+
       return Ok(ret);
     }
 
     [HttpGet("owners/pets/{petId}")]
-    [ProducesResponseType(typeof(PetDetails), 200)]
+    [ProducesResponseType(typeof(PetDetails), (int)HttpStatusCode.OK)]
     public async Task<ActionResult<PetDetails>> FindPet(int petId, CancellationToken cancellationToken)
     {
       var pet = await _petsRepo.FindById(petId, cancellationToken);
@@ -42,32 +47,27 @@ namespace spring_petclinic_customers_api.Controllers
       if (pet == null)
         throw new ResourceNotFoundException("Pet " + petId + " not found");
 
-      var ret = new PetDetails(pet);
-
-      return Ok(ret);
+      return Ok(new PetDetails(pet.Id, pet.Name, pet.Owner.FirstName+" "+pet.Owner.LastName, pet.BirthDate));
     }
 
     [HttpPost("owners/{ownerId}/pets")]
-    [ProducesResponseType(typeof(Pet), 201)]
-    [ProducesResponseType(typeof(ResourceNotFoundException), 404)]
-    public async Task<ActionResult<Pet>> ProcessCreationForm(int ownerId, [FromBody] PetRequest petRequest, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(PetDetails), (int)HttpStatusCode.Created)]
+    [ProducesResponseType(typeof(ResourceNotFoundException), (int)HttpStatusCode.NotFound)]
+    public async Task<ActionResult<PetDetails>> ProcessCreationForm(int ownerId, [FromBody] PetRequest petRequest, CancellationToken cancellationToken)
     {
       var owner = await _ownersRepo.FindById(ownerId, cancellationToken);
 
       if (owner == null)
         throw new ResourceNotFoundException("Owner " + ownerId + " not found");
 
-      //var pet = new Pet();
-      //owner.AddPet(pet);
-
       _logger.LogInformation($"Saving pet {petRequest}");
       var newPet = await _petsRepo.Save(ownerId, petRequest, cancellationToken);
 
-      return Created($"owners/pets/{newPet.Id}", newPet);
+      return Created($"owners/pets/{newPet.Id}", new PetDetails(newPet.Id, newPet.Name, newPet.Owner.FirstName + " " + newPet.Owner.LastName, newPet.BirthDate));
     }
 
     [HttpPut("owners/pets/{petId}")]
-    [ProducesResponseType(204)]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public async Task<ActionResult> ProcessUpdateForm(int petId, [FromBody] PetRequest petRequest, CancellationToken cancellationToken)
     {
       var pet = await _petsRepo.FindById(petId, cancellationToken);

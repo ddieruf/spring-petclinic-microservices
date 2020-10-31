@@ -7,8 +7,7 @@ using Xunit.Abstractions;
 using spring_petclinic_customers_api;
 using spring_petclinic_customers_api.DTOs;
 using System.Linq;
-using spring_petclinic_customers_api.Data;
-using spring_petclinic_customers_api.Views;
+using spring_petclinic_customers_api.Infrastructure;
 using System.Globalization;
 
 namespace spring_petclinic_customers_integration_test.Controllers
@@ -51,7 +50,7 @@ namespace spring_petclinic_customers_integration_test.Controllers
       var petDetails = await _client.GetFromJsonAsync<PetDetails>($"owners/pets/{pet.Id}");
 
       Assert.NotNull(petDetails);
-      Assert.Equal(petDetails.Id, pet.Id);
+      Assert.Equal(pet.Id, petDetails.Id);
     }
     [Fact(DisplayName = "POST new pet")]
     public async Task ProcessCreationForm() {

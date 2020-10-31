@@ -1,9 +1,8 @@
 using System;
 using Microsoft.EntityFrameworkCore;
-using spring_petclinic_customers_api.DTOs;
+using spring_petclinic_customers_api.Domain;
 
-namespace spring_petclinic_customers_api.Data
-{
+namespace spring_petclinic_customers_api.Infrastructure {
   public partial class CustomersContext : DbContext
   {
     public CustomersContext()
@@ -23,8 +22,8 @@ namespace spring_petclinic_customers_api.Data
     {
 //      if (!optionsBuilder.IsConfigured)
 //      {
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-//        optionsBuilder.UseSqlServer("Data Source=127.0.0.1,1433;Initial Catalog=petclinic;User Id=sa;Password=cccxcccc");
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?Linkid:723263 for guidance on storing connection strings.
+//        optionsBuilder.UseSqlServer("Data Source=127.0.0.1,1433;Initial Catalog=petclinic;User id:sa;Password=cccxcccc");
 //      }
     }
 
@@ -34,11 +33,12 @@ namespace spring_petclinic_customers_api.Data
       {
         entity.ToTable("owners");
 
-        entity.HasIndex(e => e.LastName)
-            .HasName("owners_last_name")
-            ;
+        entity.HasIndex(e => e.LastName).HasName("owners_last_name");
 
-        entity.Property(e => e.Id).HasColumnName("id");
+        entity.Property(e => e.Id)
+               .UseHiLo("owner_hilo")
+               .HasColumnName("id")
+            ;
 
         entity.Property(e => e.Address)
             .HasColumnName("address")
@@ -64,6 +64,7 @@ namespace spring_petclinic_customers_api.Data
             .HasColumnName("telephone")
             .HasMaxLength(20)
             .IsUnicode(false);
+
       });
 
       modelBuilder.Entity<Pet>(entity =>
@@ -74,7 +75,9 @@ namespace spring_petclinic_customers_api.Data
             //.HasName("pets_name")
             ;
 
-        entity.Property(e => e.Id).HasColumnName("id");
+        entity.Property(e => e.Id)
+               .UseHiLo("owner_hilo")
+               .HasColumnName("id");
 
         entity.Property(e => e.BirthDate)
             .HasColumnName("birth_date")
@@ -89,18 +92,18 @@ namespace spring_petclinic_customers_api.Data
 
         entity.Property(e => e.TypeId).HasColumnName("type_id");
 
-        entity.HasOne(d => d.Owner)
-            .WithMany(p => p.Pets)
-            .HasForeignKey(d => d.OwnerId)
-            .OnDelete(DeleteBehavior.ClientSetNull)
-            .HasConstraintName("fk_pets_owners");
+        //entity.HasOne(d => d.Owner)
+        //    .WithMany(p => p.Pets)
+        //    .HasForeignKey(d => d.OwnerId)
+        //    .OnDelete(DeleteBehavior.Cascade)
+        //    .HasConstraintName("fk_pets_owners");
 
-        entity.HasOne(d => d.PetType)
-            //.WithMany(p => p.Pets)
-            //.HasForeignKey(d => d.TypeId)
-           // .OnDelete(DeleteBehavior.ClientSetNull)
-            //.HasConstraintName("fk_pets_types")
-            ;
+        //entity.HasOne(d => d.PetType)
+        //    .WithMany(p => p.Pets)
+        //    .HasForeignKey(d => d.TypeId)
+        //    .OnDelete(DeleteBehavior.Cascade)
+        //    .HasConstraintName("fk_pets_types")
+        //    ;
       });
 
       modelBuilder.Entity<PetType>(entity =>
