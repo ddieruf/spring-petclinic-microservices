@@ -64,7 +64,7 @@ namespace spring_petclinic_visits_api
           break;
       };
 
-      app.UseHttpsRedirection();
+      //app.UseHttpsRedirection();
 
       app.UseRouting();
 

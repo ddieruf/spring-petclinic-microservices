@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 using spring_petclinic_vets_api;
 using spring_petclinic_vets_api.DTOs;
 using System.Linq;
-using spring_petclinic_vets_api.Data;
+using spring_petclinic_vets_api.Infrastructure;
 
 namespace spring_petclinic_vets_integration_test.Controllers
 {
@@ -36,12 +36,15 @@ namespace spring_petclinic_vets_integration_test.Controllers
       var respObj = await _client.GetFromJsonAsync<object>("actuator/health");
       Assert.NotNull(respObj);
     }
-    [Fact(DisplayName = "GET pet")]
+
+    [Fact(DisplayName = "GET vets")]
     public async Task FindPet() {
-      var vets = await _client.GetFromJsonAsync<Vet[]>($"vets");
+      var vets = await _client.GetFromJsonAsync<VetDetails[]>($"vets");
 
       Assert.NotNull(vets);
-      Assert.Equal(vets.Count(), Fill.Vets.Count());
+      Assert.Equal(Fill.Vets.Count(), vets.Count());
+      foreach (var vet in vets)
+        Assert.Equal(Fill.VetSpecialties.Where(q => q.VetId == vet.Id).Count(), vet.Specialties.Count());
     }
   }
 }

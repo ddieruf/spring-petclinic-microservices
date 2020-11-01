@@ -4,10 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Steeltoe.Connector.SqlServer.EFCore;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Steeltoe.Management.Tracing;
-using spring_petclinic_vets_api.Data;
+using spring_petclinic_vets_api.Infrastructure;
 
 namespace spring_petclinic_vets_api
 {
@@ -37,7 +36,8 @@ namespace spring_petclinic_vets_api
       };
 
       //REPOSITORIES
-      services.AddScoped<Repository.IVets, Repository.Vets>();
+      services.AddScoped<Infrastructure.Repository.IVets, Infrastructure.Repository.Vets>();
+      services.AddScoped<Infrastructure.Repository.IVetSpecialties, Infrastructure.Repository.VetSpecialties>();
 
       services.AddControllers();
 
@@ -62,7 +62,7 @@ namespace spring_petclinic_vets_api
         default:
           break;
       };
-      app.UseHttpsRedirection();
+      //app.UseHttpsRedirection();
 
       app.UseRouting();
 
