@@ -1,7 +1,6 @@
 using System.Threading;
 
-namespace spring_petclinic_vets_api.Data
-{
+namespace spring_petclinic_vets_api.Infrastructure {
   internal static class SeedData
   {
   public static async void SeedAll(this VetsContext dbContext,
@@ -15,9 +14,6 @@ namespace spring_petclinic_vets_api.Data
 
       foreach (var vet in Fill.Vets)
         await dbContext.AddAsync(vet, cancellationToken);
-
-      foreach (var speciality in Fill.Specialties)
-        await dbContext.AddAsync(speciality, cancellationToken);
 
       foreach (var vetSpecialty in Fill.VetSpecialties)
         await dbContext.AddAsync(vetSpecialty, cancellationToken);

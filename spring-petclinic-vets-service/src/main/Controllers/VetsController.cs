@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using spring_petclinic_vets_api.Repository;
+using spring_petclinic_vets_api.DTOs;
+using spring_petclinic_vets_api.Infrastructure.Repository;
 
 namespace spring_petclinic_vets_api.Controllers
 {
@@ -12,21 +15,37 @@ namespace spring_petclinic_vets_api.Controllers
   [Produces("application/json")]
   public class VetsController : ControllerBase
   {
-    private readonly ILogger<VetsController> _logger;
     private readonly IVets _vetsRepo;
+    private readonly IVetSpecialties _vetSpecialtiesRepo;
 
-    public VetsController(ILogger<VetsController> logger, IVets vetsRepo)
+    public VetsController(IVets vetsRepo, IVetSpecialties vetSpecialtiesRepo)
     {
-      _logger = logger;
       _vetsRepo = vetsRepo;
+      _vetSpecialtiesRepo = vetSpecialtiesRepo;
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(List<DTOs.Vet>), 200)]
-    public async Task<ActionResult<List<DTOs.Vet>>> ShowResourcesVetList(CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(List<VetDetails>), (int)HttpStatusCode.OK)]
+    public ActionResult<List<VetDetails>> ShowResourcesVetList(CancellationToken cancellationToken)
     {
-      var vets = await _vetsRepo.FindAll(cancellationToken);
-      return Ok(vets);
+      var ret = new List<VetDetails>();
+
+      _vetsRepo.FindAll().ToList().ForEach((vet) => {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var vetSpecialties = _vetSpecialtiesRepo.FindAllByVetId(vet.Id);
+
+        var specialtyDetails = new List<SpecialtyDetails>();
+        vetSpecialties.ToList().ForEach((vetSpecialty) => {
+          cancellationToken.ThrowIfCancellationRequested();
+
+          specialtyDetails.Add(new SpecialtyDetails(vetSpecialty.Specialty.Id, vetSpecialty.Specialty.Name));
+        });
+
+        ret.Add(new VetDetails(vet.Id, vet.FirstName, vet.LastName, specialtyDetails));
+      });
+
+      return Ok(ret);
     }
   }
 }
