@@ -1,7 +1,6 @@
 using System;
 using Xunit;
 using System.Linq;
-using System.Collections.Generic;
 using spring_petclinic_customers_api.Infrastructure;
 using spring_petclinic_customers_api.Domain;
 
@@ -12,41 +11,6 @@ namespace spring_petclinic_customers_unit_test
     public OwnerTest()
     {
     }
-
-    #region Test Collection Values
-    public static IEnumerable<object[]> InvalidIdValues()
-    {
-
-      return new List<object[]> {
-        new object[] { default },
-        new object[] { null },
-        new object[] { -1 },
-        new object[] { 0 }
-      };
-    }
-    public static IEnumerable<object[]> ValidPetTypeIds()
-    {
-      return new List<object[]> {
-        new object[] { Fill.PetTypes.First().Id }
-      };
-    }
-    public static IEnumerable<object[]> ValidPetIds()
-    {
-      return new List<object[]> {
-        new object[] { Fill.Pets.First().Id }
-      };
-    }
-    public static IEnumerable<object[]> ValidPageValues()
-    {
-      return new List<object[]> {
-        new object[] { 0, 1 },
-        new object[] { 0, 5 },
-        new object[] { 1, 1 },
-        new object[] { 3, 1 }
-      };
-    }
-
-    #endregion
 
     [Fact(DisplayName = "Create owner")]
     public void NewOwner() {
