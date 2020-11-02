@@ -39,7 +39,7 @@ namespace spring_petclinic_customers_api.Controllers
       return Ok(ret);
     }
 
-    [HttpGet("owners/{a}/pets/{petId:int}")]
+    [HttpGet("owners/{ownerId}/pets/{petId:int}")]
     [ProducesResponseType(typeof(PetDetails), (int)HttpStatusCode.OK)]
     public async Task<ActionResult<PetDetails>> FindPet(int petId, CancellationToken cancellationToken)
     {
@@ -63,8 +63,8 @@ namespace spring_petclinic_customers_api.Controllers
 
       _logger.LogInformation($"Saving pet {petRequest}");
 
-      var newPet = new Pet(petRequest.Name, petRequest.BirthDate, petRequest.PetTypeId, ownerId);
-      newPet.PetType = await _petsRepo.FindPetTypeById(petRequest.PetTypeId, cancellationToken);
+      var newPet = new Pet(petRequest.Name, petRequest.BirthDate, int.Parse(petRequest.TypeId), ownerId);
+      newPet.PetType = await _petsRepo.FindPetTypeById(int.Parse(petRequest.TypeId), cancellationToken);
       newPet.Owner = owner;
 
       await _petsRepo.Save(newPet, cancellationToken);
@@ -72,7 +72,7 @@ namespace spring_petclinic_customers_api.Controllers
       return Created($"owners/pets/{newPet.Id}", new PetDetails(newPet.Id, newPet.Name, newPet.Owner.FirstName + " " + newPet.Owner.LastName, newPet.BirthDate, DTOs.PetType.ToDTO(newPet.PetType)));
     }
 
-    [HttpPut("owners/pets/{petId}")]
+    [HttpPut("owners/{ownerId}/pets/{petId}")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public async Task<ActionResult> ProcessUpdateForm(int petId, [FromBody] PetRequest petRequest, CancellationToken cancellationToken)
     {

@@ -43,14 +43,23 @@ namespace spring_petclinic_visits_api.Controllers
     [HttpGet("pets/visits")]
     [ProducesResponseType(typeof(List<VisitDetails>), (int)HttpStatusCode.OK)]
     public async Task<ActionResult<List<VisitDetails>>> VisitsMultiGet([FromQuery] string petId, CancellationToken cancellationToken) {
-      string decodedPetId = HttpUtility.UrlDecode(petId);
-      List<int> petIds = petId.Split(',').Select(int.Parse).ToList();
+      if (string.IsNullOrEmpty(petId))
+        return BadRequest();
 
-      var visits = await _visitsRepo.FindByPetIdIn(petIds, cancellationToken);
+      string decodedPetId = HttpUtility.UrlDecode(petId);
+      _logger.LogInformation("Decoded string as {@DecodedPetId}", decodedPetId);
+      List<int> petIds = petId.Split(',').Select(int.Parse).ToList();
+      _logger.LogInformation("Retrieving information for pets {@PetIds}",petIds);
+
+      var visits = _visitsRepo.FindByPetIdIn(petIds);
+
+      _logger.LogInformation("Found {N} visits to return",visits.Count());
 
       var ret = new List<VisitDetails>();
       foreach (var visit in visits)
         ret.Add(VisitDetails.FromVisit(visit));
+
+      _logger.LogInformation("Formatted {N} visits with detail", ret.Count());
 
       return Ok(ret);
     }

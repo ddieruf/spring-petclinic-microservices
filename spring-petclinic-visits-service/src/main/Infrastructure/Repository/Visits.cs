@@ -20,8 +20,8 @@ namespace spring_petclinic_visits_api.Infrastructure.Repository {
     public Task<List<Visit>> FindByPetId(int petId, CancellationToken cancellationToken = default) {
       return _dbContext.Visits.Where(q => q.PetId == petId).ToListAsync(cancellationToken);
     }
-    public Task<List<Visit>> FindByPetIdIn(List<int> petIds, CancellationToken cancellationToken = default) {
-      return _dbContext.Visits.Where(q => petIds.Any(r => r == q.PetId)).ToListAsync(cancellationToken);
+    public IEnumerable<Visit> FindByPetIdIn(List<int> petIds) {
+      return _dbContext.Visits.Where(q => petIds.Any(a => a == q.PetId));
     }
     public async Task<Visit> Save(int petId, Visit visit, CancellationToken cancellationToken = default) {
       visit.SetPetId(petId);

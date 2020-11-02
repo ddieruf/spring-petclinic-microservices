@@ -51,7 +51,7 @@ namespace spring_petclinic_visits_integration_test.Controllers
     public async Task GetVisitsMultipleIds() {
       var petId1 = Fill.Visits.First().PetId;
       var petId2 = Fill.Visits.First(q => q.PetId != petId1).PetId;
-
+      
       var visits = await _client.GetFromJsonAsync<VisitDetails[]>($"pets/visits?petId={petId1}%2C{petId2}");
 
       Assert.NotNull(visits);
