@@ -27,15 +27,7 @@ namespace spring_petclinic_visits_api
     public void ConfigureServices(IServiceCollection services)
     {
       //DATA CONTEXT
-      switch (Environment.EnvironmentName) {
-        case ("Development"):
-        case ("Docker"):
-          services.AddDbContext<VisitsContext>(options => options.UseInMemoryDatabase("PetClinic_Customers"));
-          break;
-        default:
-          services.AddDbContext<VisitsContext>(options => options.UseSqlServer(Configuration));
-          break;
-      };
+      services.AddDbContext<VisitsContext>(options => options.UseInMemoryDatabase("PetClinic_Customers"));
 
       //REPOSITORIES
       services.AddScoped<IVisits, Visits>();
@@ -57,12 +49,12 @@ namespace spring_petclinic_visits_api
         case ("Docker"):
           logger.LogInformation($"Running as {Environment.EnvironmentName} environment");
           app.UseDeveloperExceptionPage();
-
-          dbContext.SeedAll();
           break;
         default:
           break;
       };
+
+      dbContext.SeedAll();
 
       //app.UseHttpsRedirection();
 

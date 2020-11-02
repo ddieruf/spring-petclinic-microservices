@@ -47,10 +47,12 @@ namespace spring_petclinic_customers_integration_test.Controllers
     public async Task FindPet() {
       var pet = Fill.Pets.First();
 
-      var petDetails = await _client.GetFromJsonAsync<PetDetails>($"owners/pets/{pet.Id}");
+      var petDetails = await _client.GetFromJsonAsync<PetDetails>($"owners/1/pets/{pet.Id}");
 
       Assert.NotNull(petDetails);
       Assert.Equal(pet.Id, petDetails.Id);
+      Assert.NotNull(petDetails.Type);
+      Assert.Equal(pet.PetTypeId, petDetails.Type.Id);
     }
     [Fact(DisplayName = "POST new pet")]
     public async Task ProcessCreationForm() {
@@ -75,7 +77,7 @@ namespace spring_petclinic_customers_integration_test.Controllers
         pet.Id,
         DateTime.ParseExact("2012-09-07", "yyyy-MM-dd", CultureInfo.InvariantCulture),
         "Updated",
-        pet.TypeId
+        pet.PetTypeId
       );
 
       var resp = await _client.PutAsJsonAsync($"owners/pets/{pet.Id}", petReq);

@@ -5,18 +5,18 @@ using System.Text.Json.Serialization;
 namespace spring_petclinic_customers_api.Domain {
   public partial class Pet
   {
-    public Pet(string name, DateTime? birthDate, int typeId, int ownerId, int id = default){
+    public Pet(string name, DateTime? birthDate, int petTypeId, int ownerId, int id = default){
       Id = id;
       Name = name ?? throw new ArgumentNullException(nameof(name));
       BirthDate = birthDate;
-      TypeId = typeId;
+      PetTypeId = petTypeId;
       OwnerId = ownerId;
     }
 
     public int Id { get; private set; }
     public string Name { get; private set; }
     public DateTime? BirthDate { get; private set; }
-    public int TypeId { get; private set; }
+    public int PetTypeId { get; private set; }
     public int OwnerId { get; private set; }
 
     [JsonIgnore]
@@ -30,8 +30,7 @@ namespace spring_petclinic_customers_api.Domain {
   name: {this.Name},
   birthDate: {this.BirthDate},
   type: {this.PetType},
-  ownerFirstname: {this.Owner?.FirstName},
-  ownerLastname: {this.Owner?.LastName}";
+  owner: {this.Owner}";
     }
 
     public void SetBirthDate(DateTime? birthDate) {

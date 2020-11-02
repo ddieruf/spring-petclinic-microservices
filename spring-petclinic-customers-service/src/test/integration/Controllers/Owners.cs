@@ -55,6 +55,7 @@ namespace spring_petclinic_customers_integration_test.Controllers
       Assert.Equal(o.Id, owner.Id);
       Assert.Equal(Fill.Pets.Where(q => q.OwnerId == owner.Id).Count(), owner.Pets.Count());
       Assert.NotNull(owner.Pets.First().Name);
+      Assert.NotNull(owner.Pets.First().Type);
     }
     [Fact(DisplayName = "POST new owner")]
     public async Task CreateOwner() {

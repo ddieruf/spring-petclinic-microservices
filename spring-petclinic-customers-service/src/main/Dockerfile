@@ -20,7 +20,9 @@ COPY --from=builder application/dockerize /usr/local/bin/dockerize
 ARG EXPOSED_PORT=5000
 ENV PORT ${EXPOSED_PORT}
 EXPOSE ${EXPOSED_PORT}
+
 ENV ASPNETCORE_ENVIRONMENT Docker
+ENV ASPNETCORE_URLS http://*:${EXPOSED_PORT}
 
 COPY --from=builder application/publish .
 ENTRYPOINT ["dockerize","-timeout=10s","--","dotnet", "customers-service.dll"]

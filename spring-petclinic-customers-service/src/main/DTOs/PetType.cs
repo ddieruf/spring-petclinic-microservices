@@ -10,7 +10,7 @@ namespace spring_petclinic_customers_api.DTOs
     public int Id { get; set; }
     public string Name { get; set; }
 
-    public static DTOs.PetType ToDTO(Domain.PetType petType) {
+    public static PetType ToDTO(Domain.PetType petType) {
       return new PetType() {
         Id = petType.Id,
         Name = petType.Name

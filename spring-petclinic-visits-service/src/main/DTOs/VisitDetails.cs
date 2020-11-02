@@ -6,26 +6,26 @@ namespace spring_petclinic_visits_api.DTOs {
   public class VisitDetails {
     public VisitDetails() { }
 
-    public VisitDetails(int id, int petId, DateTime? visitDate, string description) {
+    public VisitDetails(int id, int petId, DateTime? date, string description) {
       Id = id;
-      PetId = petId;
-      VisitDate = visitDate;
-      Description = description;
+      this.petId = petId;
+      Date = date;
+      this.description = description;
     }
 
     public int Id { get; set; }
-    public int PetId { get; set; }
+    public int petId { get; set; }
 
     [JsonConverter(typeof(DateTimeConverter))]
-    public DateTime? VisitDate { get; set; }
-    public string Description { get; set; }
+    public DateTime? Date { get; set; }
+    public string description { get; set; }
 
     public static VisitDetails FromVisit(Visit visit) {
       return new VisitDetails() {
         Id = visit.Id,
-        PetId = visit.PetId,
-        VisitDate = visit.VisitDate,
-        Description = visit.Description
+        petId = visit.PetId,
+        Date = visit.Date,
+        description = visit.Description
       };
     }
   }

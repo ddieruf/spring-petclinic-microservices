@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using spring_petclinic_visits_api.Domain;
@@ -40,8 +42,11 @@ namespace spring_petclinic_visits_api.Controllers
 
     [HttpGet("pets/visits")]
     [ProducesResponseType(typeof(List<VisitDetails>), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult<List<VisitDetails>>> VisitsMultiGet([FromQuery] int[] petId, CancellationToken cancellationToken) {
-      var visits = await _visitsRepo.FindByPetIdIn(petId, cancellationToken);
+    public async Task<ActionResult<List<VisitDetails>>> VisitsMultiGet([FromQuery] string petId, CancellationToken cancellationToken) {
+      string decodedPetId = HttpUtility.UrlDecode(petId);
+      List<int> petIds = petId.Split(',').Select(int.Parse).ToList();
+
+      var visits = await _visitsRepo.FindByPetIdIn(petIds, cancellationToken);
 
       var ret = new List<VisitDetails>();
       foreach (var visit in visits)

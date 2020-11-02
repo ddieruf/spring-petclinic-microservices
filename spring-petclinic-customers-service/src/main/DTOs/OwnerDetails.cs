@@ -32,7 +32,7 @@ namespace spring_petclinic_customers_api.DTOs {
         Address = owner.Address,
         City = owner.City,
         Telephone = owner.Telephone,
-        Pets = owner.Pets.Select(q => new PetDetails(q.Id, q.Name, owner.FirstName+" "+owner.LastName,q.BirthDate)).ToList()
+        Pets = owner.Pets.Select(q => new PetDetails(q.Id, q.Name, owner.FirstName+" "+owner.LastName,q.BirthDate, PetType.ToDTO(q.PetType))).ToList()
       };
     }
   }

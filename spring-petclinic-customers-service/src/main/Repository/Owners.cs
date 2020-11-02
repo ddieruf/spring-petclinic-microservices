@@ -19,15 +19,15 @@ namespace spring_petclinic_customers_api.Repository
     }
 
     public Task<Owner> FindById(int id, CancellationToken cancellationToken = default) {
-      return _dbContext.Owners.Include(b => b.Pets).FirstAsync(q => q.Id == id, cancellationToken);
+      return _dbContext.Owners.Include(b => b.Pets).ThenInclude(p => p.PetType).FirstAsync(q => q.Id == id, cancellationToken);
     }
 
     public Task<List<Owner>> FindAll(CancellationToken cancellationToken = default) {
-      return _dbContext.Owners.Include(b => b.Pets).ToListAsync(cancellationToken);
+      return _dbContext.Owners.Include(b => b.Pets).ThenInclude(p => p.PetType).ToListAsync(cancellationToken);
     }
 
     public Task<List<Owner>> FindAll(int page, int pageSize, CancellationToken cancellationToken = default) {
-      return _dbContext.Owners.Include(b => b.Pets).Skip(page * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+      return _dbContext.Owners.Include(b => b.Pets).ThenInclude(p => p.PetType).Skip(page * pageSize).Take(pageSize).ToListAsync(cancellationToken);
     }
 
     public async Task<Owner> Save(Owner owner, CancellationToken cancellationToken = default) {

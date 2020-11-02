@@ -23,7 +23,7 @@ namespace spring_petclinic_visits_api
                 {
                     webBuilder.UseStartup<Startup>();
                 })
-                .UseCloudHosting(5000)
+                .UseCloudHosting(5001)
                 .AddAllActuators()
                 .AddDynamicLogging()
                 .AddConfigServer(GetLoggerFactory())

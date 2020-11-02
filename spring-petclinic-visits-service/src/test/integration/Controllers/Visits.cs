@@ -47,6 +47,17 @@ namespace spring_petclinic_visits_integration_test.Controllers
       Assert.Equal(Fill.Visits.Where(q => q.PetId == petId).Count(), visits.Count());
     }
 
+    [Fact(DisplayName = "GET visit by petIds")]
+    public async Task GetVisitsMultipleIds() {
+      var petId1 = Fill.Visits.First().PetId;
+      var petId2 = Fill.Visits.First(q => q.PetId != petId1).PetId;
+
+      var visits = await _client.GetFromJsonAsync<VisitDetails[]>($"pets/visits?petId={petId1}%2C{petId2}");
+
+      Assert.NotNull(visits);
+      Assert.NotEmpty(visits);
+    }
+
     [Fact(DisplayName = "POST new visit")]
     public async Task Save() {
       var petId = Fill.Visits.First().PetId;
@@ -63,7 +74,7 @@ namespace spring_petclinic_visits_integration_test.Controllers
       var vist = await resp.Content.ReadFromJsonAsync<VisitDetails>();
 
       Assert.NotNull(vist);
-      Assert.Equal(visitRequest.Description, vist.Description);
+      Assert.Equal(visitRequest.Description, vist.description);
     }
   }
 }

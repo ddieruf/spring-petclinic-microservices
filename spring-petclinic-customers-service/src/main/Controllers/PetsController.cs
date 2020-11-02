@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using spring_petclinic_customers_api.Domain;
 using spring_petclinic_customers_api.DTOs;
 using spring_petclinic_customers_api.Repository;
 using System.Collections.Generic;
@@ -33,12 +34,12 @@ namespace spring_petclinic_customers_api.Controllers
 
       var ret = new List<DTOs.PetType>();
       foreach (var petType in petTypes)
-        ret.Add(PetType.ToDTO(petType));
+        ret.Add(DTOs.PetType.ToDTO(petType));
 
       return Ok(ret);
     }
 
-    [HttpGet("owners/pets/{petId}")]
+    [HttpGet("owners/{a}/pets/{petId:int}")]
     [ProducesResponseType(typeof(PetDetails), (int)HttpStatusCode.OK)]
     public async Task<ActionResult<PetDetails>> FindPet(int petId, CancellationToken cancellationToken)
     {
@@ -47,7 +48,7 @@ namespace spring_petclinic_customers_api.Controllers
       if (pet == null)
         throw new ResourceNotFoundException("Pet " + petId + " not found");
 
-      return Ok(new PetDetails(pet.Id, pet.Name, pet.Owner.FirstName+" "+pet.Owner.LastName, pet.BirthDate));
+      return Ok(new PetDetails(pet.Id, pet.Name, pet.Owner.FirstName+" "+pet.Owner.LastName, pet.BirthDate, DTOs.PetType.ToDTO(pet.PetType)));
     }
 
     [HttpPost("owners/{ownerId}/pets")]
@@ -61,9 +62,14 @@ namespace spring_petclinic_customers_api.Controllers
         throw new ResourceNotFoundException("Owner " + ownerId + " not found");
 
       _logger.LogInformation($"Saving pet {petRequest}");
-      var newPet = await _petsRepo.Save(ownerId, petRequest, cancellationToken);
 
-      return Created($"owners/pets/{newPet.Id}", new PetDetails(newPet.Id, newPet.Name, newPet.Owner.FirstName + " " + newPet.Owner.LastName, newPet.BirthDate));
+      var newPet = new Pet(petRequest.Name, petRequest.BirthDate, petRequest.PetTypeId, ownerId);
+      newPet.PetType = await _petsRepo.FindPetTypeById(petRequest.PetTypeId, cancellationToken);
+      newPet.Owner = owner;
+
+      await _petsRepo.Save(newPet, cancellationToken);
+
+      return Created($"owners/pets/{newPet.Id}", new PetDetails(newPet.Id, newPet.Name, newPet.Owner.FirstName + " " + newPet.Owner.LastName, newPet.BirthDate, DTOs.PetType.ToDTO(newPet.PetType)));
     }
 
     [HttpPut("owners/pets/{petId}")]
@@ -76,7 +82,11 @@ namespace spring_petclinic_customers_api.Controllers
         throw new ResourceNotFoundException("Pet " + petId + " not found");
 
       _logger.LogInformation($"Updating pet {petRequest}");
-      await _petsRepo.Update(petId, petRequest, cancellationToken);
+
+      pet.SetBirthDate(petRequest.BirthDate);
+      pet.SetName(petRequest.Name);
+
+      await _petsRepo.Update(pet, cancellationToken);
 
       return NoContent();
     }

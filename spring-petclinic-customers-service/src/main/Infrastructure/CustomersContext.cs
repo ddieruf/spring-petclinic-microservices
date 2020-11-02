@@ -90,7 +90,7 @@ namespace spring_petclinic_customers_api.Infrastructure {
 
         entity.Property(e => e.OwnerId).HasColumnName("owner_id");
 
-        entity.Property(e => e.TypeId).HasColumnName("type_id");
+        entity.Property(e => e.PetTypeId).HasColumnName("type_id");
 
         //entity.HasOne(d => d.Owner)
         //    .WithMany(p => p.Pets)

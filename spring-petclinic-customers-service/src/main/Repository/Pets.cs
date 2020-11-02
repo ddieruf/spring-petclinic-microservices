@@ -28,38 +28,24 @@ namespace spring_petclinic_customers_api.Repository
     }
 
     public Task<Pet> FindById(int id, CancellationToken cancellationToken = default) {
-      return _dbContext.Pets.Include(b => b.Owner).FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
+      return _dbContext.Pets.Include(b => b.Owner).Include(b => b.PetType).FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
     }
 
     public Task<List<Pet>> FindAll(CancellationToken cancellationToken = default) {
-      return _dbContext.Pets.Include(b => b.Owner).ToListAsync(cancellationToken);
+      return _dbContext.Pets.Include(b => b.Owner).Include(b => b.PetType).ToListAsync(cancellationToken);
     }
 
     public Task<List<Pet>> FindAll(int page, int pageSize, CancellationToken cancellationToken = default) {
-      return _dbContext.Pets.Include(b => b.Owner).Skip(page * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+      return _dbContext.Pets.Include(b => b.Owner).Include(b => b.PetType).Skip(page * pageSize).Take(pageSize).ToListAsync(cancellationToken);
     }
 
-    public async Task<Pet> Save(int ownerId, DTOs.PetRequest petReuqest, CancellationToken cancellationToken = default) {
-      var owner = await _dbContext.Owners.FirstOrDefaultAsync(q => q.Id == ownerId, cancellationToken);
-
-      if (owner == null)
-        throw new ArgumentOutOfRangeException(nameof(ownerId));
-
-      var newPet = new Pet(petReuqest.Name, petReuqest.BirthDate, petReuqest.PetTypeId, ownerId);
-
-      _dbContext.Pets.Add(newPet);
+    public async Task Save(Pet pet, CancellationToken cancellationToken = default) {
+      _dbContext.Pets.Add(pet);
       await _dbContext.SaveChangesAsync(cancellationToken);
-      return newPet;
     }
-    public async Task<Pet> Update(int petId, DTOs.PetRequest petReuqest, CancellationToken cancellationToken = default) {
-      var pet = await FindById(petId);
-
-      pet.SetBirthDate(petReuqest.BirthDate);
-      pet.SetName(petReuqest.Name);
-
+    public async Task Update(Pet pet, CancellationToken cancellationToken = default) {
       _dbContext.Pets.Update(pet);
       await _dbContext.SaveChangesAsync(cancellationToken);
-      return pet;
     }
     //public Task Delete(Pet pet, CancellationToken cancellationToken = default)
     //{

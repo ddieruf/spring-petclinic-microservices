@@ -36,7 +36,7 @@ namespace spring_petclinic_visits_api.Infrastructure
 
         entity.Property(e => e.PetId).HasColumnName("pet_id");
 
-        entity.Property(e => e.VisitDate)
+        entity.Property(e => e.Date)
             .HasColumnName("visit_date")
             .HasColumnType("date");
       });
