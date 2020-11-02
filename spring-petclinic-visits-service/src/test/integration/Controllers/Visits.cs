@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 using spring_petclinic_visits_api;
 using spring_petclinic_visits_api.DTOs;
 using System.Linq;
-using spring_petclinic_visits_api.Data;
+using spring_petclinic_visits_api.Infrastructure;
 
 namespace spring_petclinic_visits_integration_test.Controllers
 {
@@ -41,30 +41,29 @@ namespace spring_petclinic_visits_integration_test.Controllers
     public async Task GetVisits() {
       var petId = Fill.Visits.First().PetId;
 
-      var visits = await _client.GetFromJsonAsync<Visit[]>($"owners/pets/{petId}/visits");
+      var visits = await _client.GetFromJsonAsync<VisitDetails[]>($"owners/pets/{petId}/visits");
 
       Assert.NotNull(visits);
-      Assert.Equal(visits.Count(), Fill.Visits.Where(q => q.PetId == petId).Count());
+      Assert.Equal(Fill.Visits.Where(q => q.PetId == petId).Count(), visits.Count());
     }
 
     [Fact(DisplayName = "POST new visit")]
     public async Task Save() {
       var petId = Fill.Visits.First().PetId;
 
-      var newVisit = new Visit() {
-        Id = 87,
+      var visitRequest = new VisitRequest() {
         Description = "Another one",
         VisitDate = DateTime.Now
       };
 
-      var resp = await _client.PostAsJsonAsync($"owners/pets/{petId}/visits", newVisit);
+      var resp = await _client.PostAsJsonAsync($"owners/pets/{petId}/visits", visitRequest);
 
       Assert.True(resp.IsSuccessStatusCode);
 
-      var vist = await resp.Content.ReadFromJsonAsync<Visit>();
+      var vist = await resp.Content.ReadFromJsonAsync<VisitDetails>();
 
       Assert.NotNull(vist);
-      Assert.Equal(newVisit.Id, vist.Id);
+      Assert.Equal(visitRequest.Description, vist.Description);
     }
   }
 }

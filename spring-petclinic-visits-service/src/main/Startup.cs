@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Steeltoe.Connector.SqlServer.EFCore;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Steeltoe.Management.Tracing;
-using spring_petclinic_visits_api.Data;
+using spring_petclinic_visits_api.Infrastructure;
+using spring_petclinic_visits_api.Infrastructure.Repository;
 
 namespace spring_petclinic_visits_api
 {
@@ -38,7 +38,7 @@ namespace spring_petclinic_visits_api
       };
 
       //REPOSITORIES
-      services.AddScoped<Repository.IVisits, Repository.Visits>();
+      services.AddScoped<IVisits, Visits>();
 
       services.AddControllers();
 

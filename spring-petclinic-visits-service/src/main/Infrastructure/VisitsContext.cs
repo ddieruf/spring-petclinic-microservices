@@ -1,8 +1,8 @@
 using System;
 using Microsoft.EntityFrameworkCore;
-using spring_petclinic_visits_api.DTOs;
+using spring_petclinic_visits_api.Domain;
 
-namespace spring_petclinic_visits_api.Data
+namespace spring_petclinic_visits_api.Infrastructure
 {
   public partial class VisitsContext : DbContext
   {

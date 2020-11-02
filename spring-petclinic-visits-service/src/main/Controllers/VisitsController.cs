@@ -4,7 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using spring_petclinic_visits_api.Repository;
+using spring_petclinic_visits_api.Domain;
+using spring_petclinic_visits_api.DTOs;
+using spring_petclinic_visits_api.Infrastructure.Repository;
 
 namespace spring_petclinic_visits_api.Controllers
 {
@@ -23,27 +25,40 @@ namespace spring_petclinic_visits_api.Controllers
     }
 
     [HttpGet("owners/{a}/pets/{petId:int}/visits")]
-    [ProducesResponseType(typeof(List<DTOs.Visit>), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult<List<DTOs.Visit>>> Visits(int petId, CancellationToken cancellationToken)
+    [HttpGet("owners/pets/{petId:int}/visits")]
+    [ProducesResponseType(typeof(List<VisitDetails>), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<List<VisitDetails>>> Visits(int petId, CancellationToken cancellationToken)
     {
       var visits = await _visitsRepo.FindByPetId(petId, cancellationToken);
-      return Ok(visits);
+
+      var ret = new List<VisitDetails>();
+      foreach (var visit in visits)
+        ret.Add(VisitDetails.FromVisit(visit));
+
+      return Ok(ret);
     }
 
     [HttpGet("pets/visits")]
-    [ProducesResponseType(typeof(List<DTOs.Visit>), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult<List<DTOs.Visit>>> VisitsMultiGet([FromQuery] int[] petId, CancellationToken cancellationToken) {
+    [ProducesResponseType(typeof(List<VisitDetails>), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<List<VisitDetails>>> VisitsMultiGet([FromQuery] int[] petId, CancellationToken cancellationToken) {
       var visits = await _visitsRepo.FindByPetIdIn(petId, cancellationToken);
-      return Ok(visits);
+
+      var ret = new List<VisitDetails>();
+      foreach (var visit in visits)
+        ret.Add(VisitDetails.FromVisit(visit));
+
+      return Ok(ret);
     }
 
     [HttpPost("owners/{a}/pets/{petId:int}/visits")]
+    [HttpPost("owners/pets/{petId:int}/visits")]
     [ProducesResponseType((int)HttpStatusCode.Created)]
-    public async Task<ActionResult> Create(int petId,[FromBody] DTOs.Visit visit, CancellationToken cancellationToken) {
-      visit.PetId = petId;
-      _logger.LogInformation($"Saving visit {visit}");
+    public async Task<ActionResult> Create(int petId,[FromBody] VisitRequest visitRequest, CancellationToken cancellationToken) {
+      _logger.LogInformation($"Saving visit {visitRequest}");
+
+      var visit = new Visit(petId, visitRequest.VisitDate, visitRequest.Description);
       var newVisit = await _visitsRepo.Save(petId, visit, cancellationToken);
-      return Created($"owners/pets/{petId}/visits", newVisit);
+      return Created($"owners/pets/{petId}/visits", VisitDetails.FromVisit(newVisit));
     }
   }
 }

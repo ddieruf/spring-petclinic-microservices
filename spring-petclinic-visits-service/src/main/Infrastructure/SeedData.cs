@@ -1,8 +1,8 @@
 using System.Threading;
 
-namespace spring_petclinic_visits_api.Data
+namespace spring_petclinic_visits_api.Infrastructure
 {
-  internal static class SeedData
+  public static class SeedData
   {
   public static async void SeedAll(this VisitsContext dbContext,
 			bool ensureDelete = false,
