@@ -34,16 +34,16 @@ namespace spring_petclinic_customers_api.Controllers
     }
 
     [HttpGet("{ownerId}")]
-    [ProducesResponseType(typeof(DTOs.OwnerDetails), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult<DTOs.OwnerDetails>> FindOwner(int ownerId, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(OwnerDetails), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<OwnerDetails>> FindOwner(int ownerId, CancellationToken cancellationToken)
     {
       var owner = await _ownersRepo.FindById(ownerId, cancellationToken);
       return Ok(OwnerDetails.FromOwner(owner));
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(List<DTOs.OwnerDetails>), (int)HttpStatusCode.OK)]
-    public async Task<ActionResult<List<DTOs.OwnerDetails>>> FindAll(CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(List<OwnerDetails>), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<List<OwnerDetails>>> FindAll(CancellationToken cancellationToken)
     {
       var owners = await _ownersRepo.FindAll(cancellationToken);
 
